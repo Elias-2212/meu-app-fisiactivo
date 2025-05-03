@@ -1,1 +1,869 @@
-# fisiactivo
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FísiActivo - Controle de Atividades Físicas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-gradient-to-r from-green-600 to-green-400 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-bold flex items-center gap-2">
+        <i class="fas fa-running"></i> FísiActivo
+      </h1>
+      <nav class="hidden md:flex space-x-6 font-semibold text-green-100">
+        <button id="btn-start" class="hover:text-white transition">Início</button>
+        <button id="btn-history" class="hover:text-white transition">Histórico</button>
+        <button id="btn-stats" class="hover:text-white transition">Estatísticas</button>
+        <button id="btn-settings" class="hover:text-white transition flex items-center gap-1">
+          <i class="fas fa-cog"></i> Configurações
+        </button>
+      </nav>
+      <button id="btn-menu" class="md:hidden text-white text-2xl focus:outline-none">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    <nav id="mobile-menu" class="hidden md:hidden bg-green-500 text-green-100 px-4 py-2 space-y-2">
+      <button id="m-btn-start" class="block w-full text-left hover:text-white font-semibold">Início</button>
+      <button id="m-btn-history" class="block w-full text-left hover:text-white font-semibold">Histórico</button>
+      <button id="m-btn-stats" class="block w-full text-left hover:text-white font-semibold">Estatísticas</button>
+      <button id="m-btn-settings" class="block w-full text-left hover:text-white font-semibold flex items-center gap-1">
+        <i class="fas fa-cog"></i> Configurações
+      </button>
+    </nav>
+  </header>
+
+  <main class="flex-grow max-w-5xl mx-auto px-4 py-6 w-full">
+    <!-- Início / Controle de Atividades -->
+    <section id="section-start" class="space-y-6">
+      <h2 class="text-3xl font-extrabold text-green-700 mb-2 flex items-center gap-3">
+        <i class="fas fa-play-circle text-green-600"></i> Controle de Atividades
+      </h2>
+
+      <div class="bg-white rounded-lg shadow p-6 space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center md:space-x-8 space-y-4 md:space-y-0">
+          <div class="flex-1">
+            <label for="activity-type" class="block font-semibold text-gray-700 mb-1">Tipo de Atividade</label>
+            <select id="activity-type" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400">
+              <option value="caminhada">Caminhada</option>
+              <option value="corrida">Corrida</option>
+              <option value="ciclismo">Ciclismo</option>
+              <option value="natação">Natação</option>
+              <option value="treino">Treino</option>
+              <option value="yoga">Yoga</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+          <div class="flex-1">
+            <label for="intensity-level" class="block font-semibold text-gray-700 mb-1">Intensidade</label>
+            <select id="intensity-level" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400">
+              <option value="leve">Leve</option>
+              <option value="moderada" selected>Moderada</option>
+              <option value="intensa">Intensa</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-center md:space-x-6 space-y-4 md:space-y-0">
+          <button
+            id="btn-start-activity"
+            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-md shadow-md transition flex items-center justify-center gap-3"
+          >
+            <i class="fas fa-play"></i> Começar Atividade
+          </button>
+          <button
+            id="btn-stop-activity"
+            disabled
+            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-md shadow-md transition flex items-center justify-center gap-3 opacity-50 cursor-not-allowed"
+          >
+            <i class="fas fa-stop"></i> Parar Atividade
+          </button>
+        </div>
+
+        <div id="activity-info" class="hidden bg-green-50 border border-green-300 rounded-md p-4 space-y-3">
+          <h3 class="text-xl font-semibold text-green-700 flex items-center gap-2">
+            <i class="fas fa-info-circle"></i> Informações da Atividade
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-green-800 font-semibold">
+            <div>
+              <p class="text-sm">Tempo</p>
+              <p id="time-elapsed" class="text-2xl">00:00:00</p>
+            </div>
+            <div>
+              <p class="text-sm">Distância</p>
+              <p id="distance" class="text-2xl">0.00 km</p>
+            </div>
+            <div>
+              <p class="text-sm">Calorias</p>
+              <p id="calories" class="text-2xl">0 kcal</p>
+            </div>
+            <div>
+              <p class="text-sm">Intensidade</p>
+              <p id="intensity" class="text-2xl">Moderada</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="map-container" class="hidden rounded-md overflow-hidden border border-green-300 shadow-md mt-6">
+          <iframe
+            id="map-frame"
+            src=""
+            class="w-full h-64 md:h-96"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Mapa para rastreamento da atividade física"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- Histórico -->
+    <section id="section-history" class="hidden space-y-6">
+      <h2 class="text-3xl font-extrabold text-green-700 mb-2 flex items-center gap-3">
+        <i class="fas fa-history text-green-600"></i> Histórico de Atividades
+      </h2>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 space-y-4 md:space-y-0">
+          <div>
+            <label for="filter-type" class="font-semibold text-gray-700 mr-2">Filtrar por Tipo:</label>
+            <select id="filter-type" class="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-400">
+              <option value="todos" selected>Todos</option>
+              <option value="caminhada">Caminhada</option>
+              <option value="corrida">Corrida</option>
+              <option value="ciclismo">Ciclismo</option>
+              <option value="natação">Natação</option>
+              <option value="treino">Treino</option>
+              <option value="yoga">Yoga</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-date" class="font-semibold text-gray-700 mr-2">Filtrar por Data:</label>
+            <select id="filter-date" class="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-400">
+              <option value="todos" selected>Todos</option>
+              <option value="dia">Dia</option>
+              <option value="mes">Mês</option>
+              <option value="ano">Ano</option>
+            </select>
+            <input
+              type="date"
+              id="filter-date-input"
+              class="border border-gray-300 rounded-md px-3 py-1 ml-2 hidden focus:outline-none focus:ring-2 focus:ring-green-400"
+            />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-green-100 text-green-800 font-semibold">
+              <tr>
+                <th class="p-3 border border-green-200">Data</th>
+                <th class="p-3 border border-green-200">Tipo</th>
+                <th class="p-3 border border-green-200">Tempo</th>
+                <th class="p-3 border border-green-200">Distância (km)</th>
+                <th class="p-3 border border-green-200">Calorias (kcal)</th>
+                <th class="p-3 border border-green-200">Intensidade</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body" class="text-gray-700">
+              <!-- Histórico será inserido aqui via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Estatísticas -->
+    <section id="section-stats" class="hidden space-y-6">
+      <h2 class="text-3xl font-extrabold text-green-700 mb-2 flex items-center gap-3">
+        <i class="fas fa-chart-bar text-green-600"></i> Estatísticas
+      </h2>
+
+      <div class="bg-white rounded-lg shadow p-6 space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center md:space-x-6 space-y-4 md:space-y-0">
+          <label for="stats-type" class="font-semibold text-gray-700">Visualizar estatísticas por:</label>
+          <select id="stats-type" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 w-full md:w-64">
+            <option value="atividade">Atividade</option>
+            <option value="dia">Dia</option>
+            <option value="mes">Mês</option>
+            <option value="ano">Ano</option>
+          </select>
+        </div>
+
+        <div id="stats-content" class="text-gray-700">
+          <p class="text-center text-gray-500">Selecione um tipo para visualizar as estatísticas.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Configurações -->
+    <section id="section-settings" class="hidden space-y-6">
+      <h2 class="text-3xl font-extrabold text-green-700 mb-2 flex items-center gap-3">
+        <i class="fas fa-cogs text-green-600"></i> Configurações
+      </h2>
+
+      <div class="bg-white rounded-lg shadow p-6 space-y-6 max-w-md">
+        <div>
+          <label for="user-weight" class="block font-semibold text-gray-700 mb-1">Peso (kg)</label>
+          <input
+            type="number"
+            id="user-weight"
+            min="20"
+            max="300"
+            step="0.1"
+            placeholder="Ex: 70.5"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+          />
+        </div>
+        <div>
+          <label for="user-height" class="block font-semibold text-gray-700 mb-1">Altura (cm)</label>
+          <input
+            type="number"
+            id="user-height"
+            min="50"
+            max="250"
+            step="1"
+            placeholder="Ex: 175"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+          />
+        </div>
+        <div>
+          <label for="user-age" class="block font-semibold text-gray-700 mb-1">Idade</label>
+          <input
+            type="number"
+            id="user-age"
+            min="5"
+            max="120"
+            step="1"
+            placeholder="Ex: 30"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+          />
+        </div>
+        <div>
+          <label for="user-gender" class="block font-semibold text-gray-700 mb-1">Gênero</label>
+          <select
+            id="user-gender"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+          >
+            <option value="masculino">Masculino</option>
+            <option value="feminino">Feminino</option>
+            <option value="outro">Outro</option>
+            <option value="prefiro-nao-dizer">Prefiro não dizer</option>
+          </select>
+        </div>
+        <button
+          id="btn-save-settings"
+          class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-md shadow-md transition"
+        >
+          Salvar Configurações
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-green-600 text-green-100 text-center py-4 mt-auto shadow-inner">
+    <p>© 2024 FísiActivo - Controle de Atividades Físicas. Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    // DOM Elements
+    const btnStart = document.getElementById('btn-start');
+    const btnHistory = document.getElementById('btn-history');
+    const btnStats = document.getElementById('btn-stats');
+    const btnSettings = document.getElementById('btn-settings');
+    const btnMenu = document.getElementById('btn-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    const mBtnStart = document.getElementById('m-btn-start');
+    const mBtnHistory = document.getElementById('m-btn-history');
+    const mBtnStats = document.getElementById('m-btn-stats');
+    const mBtnSettings = document.getElementById('m-btn-settings');
+
+    const sectionStart = document.getElementById('section-start');
+    const sectionHistory = document.getElementById('section-history');
+    const sectionStats = document.getElementById('section-stats');
+    const sectionSettings = document.getElementById('section-settings');
+
+    const btnStartActivity = document.getElementById('btn-start-activity');
+    const btnStopActivity = document.getElementById('btn-stop-activity');
+
+    const activityInfo = document.getElementById('activity-info');
+    const timeElapsedEl = document.getElementById('time-elapsed');
+    const distanceEl = document.getElementById('distance');
+    const caloriesEl = document.getElementById('calories');
+    const intensityEl = document.getElementById('intensity');
+
+    const mapContainer = document.getElementById('map-container');
+    const mapFrame = document.getElementById('map-frame');
+
+    const activityTypeSelect = document.getElementById('activity-type');
+    const intensityLevelSelect = document.getElementById('intensity-level');
+
+    const filterType = document.getElementById('filter-type');
+    const filterDate = document.getElementById('filter-date');
+    const filterDateInput = document.getElementById('filter-date-input');
+    const historyTableBody = document.getElementById('history-table-body');
+
+    const statsType = document.getElementById('stats-type');
+    const statsContent = document.getElementById('stats-content');
+
+    const userWeightInput = document.getElementById('user-weight');
+    const userHeightInput = document.getElementById('user-height');
+    const userAgeInput = document.getElementById('user-age');
+    const userGenderSelect = document.getElementById('user-gender');
+    const btnSaveSettings = document.getElementById('btn-save-settings');
+
+    // Mobile menu toggle
+    btnMenu.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Navigation functions
+    function showSection(section) {
+      sectionStart.classList.add('hidden');
+      sectionHistory.classList.add('hidden');
+      sectionStats.classList.add('hidden');
+      sectionSettings.classList.add('hidden');
+      section.classList.remove('hidden');
+      mobileMenu.classList.add('hidden');
+    }
+
+    btnStart.addEventListener('click', () => showSection(sectionStart));
+    btnHistory.addEventListener('click', () => {
+      showSection(sectionHistory);
+      renderHistory();
+    });
+    btnStats.addEventListener('click', () => {
+      showSection(sectionStats);
+      renderStats();
+    });
+    btnSettings.addEventListener('click', () => showSection(sectionSettings));
+
+    mBtnStart.addEventListener('click', () => showSection(sectionStart));
+    mBtnHistory.addEventListener('click', () => {
+      showSection(sectionHistory);
+      renderHistory();
+    });
+    mBtnStats.addEventListener('click', () => {
+      showSection(sectionStats);
+      renderStats();
+    });
+    mBtnSettings.addEventListener('click', () => showSection(sectionSettings));
+
+    // Activity tracking variables
+    let watchId = null;
+    let activityStartTime = null;
+    let activityTimer = null;
+    let elapsedSeconds = 0;
+    let totalDistance = 0; // in meters
+    let lastPosition = null;
+    let caloriesBurned = 0;
+    let activityIntensity = 'Moderada';
+    let activityType = 'caminhada';
+
+    // User profile defaults
+    let userProfile = {
+      weight: 70, // kg
+      height: 175, // cm
+      age: 30,
+      gender: 'masculino',
+    };
+
+    // Load user profile from localStorage
+    function loadUserProfile() {
+      const saved = localStorage.getItem('fisiactivo-user-profile');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          userProfile = { ...userProfile, ...parsed };
+          userWeightInput.value = userProfile.weight;
+          userHeightInput.value = userProfile.height;
+          userAgeInput.value = userProfile.age;
+          userGenderSelect.value = userProfile.gender;
+        } catch {}
+      }
+    }
+    loadUserProfile();
+
+    // Save user profile
+    btnSaveSettings.addEventListener('click', () => {
+      const weight = parseFloat(userWeightInput.value);
+      const height = parseInt(userHeightInput.value);
+      const age = parseInt(userAgeInput.value);
+      const gender = userGenderSelect.value;
+
+      if (
+        isNaN(weight) ||
+        weight < 20 ||
+        weight > 300 ||
+        isNaN(height) ||
+        height < 50 ||
+        height > 250 ||
+        isNaN(age) ||
+        age < 5 ||
+        age > 120
+      ) {
+        alert('Por favor, preencha os dados corretamente.');
+        return;
+      }
+
+      userProfile = { weight, height, age, gender };
+      localStorage.setItem('fisiactivo-user-profile', JSON.stringify(userProfile));
+      alert('Configurações salvas com sucesso!');
+    });
+
+    // Format time HH:MM:SS
+    function formatTime(seconds) {
+      const h = Math.floor(seconds / 3600)
+        .toString()
+        .padStart(2, '0');
+      const m = Math.floor((seconds % 3600) / 60)
+        .toString()
+        .padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    // Calculate distance between two GPS points (Haversine formula)
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371000; // meters
+      const toRad = (deg) => (deg * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) *
+          Math.cos(toRad(lat2)) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    // Estimate calories burned based on MET values and user profile
+    // MET values approximate for activities:
+    // Caminhada leve: 3.5, moderada: 4.3, intensa: 5.0
+    // Corrida leve: 7.0, moderada: 9.8, intensa: 11.0
+    // Ciclismo leve: 4.0, moderada: 6.8, intensa: 8.0
+    // Natação leve: 6.0, moderada: 8.0, intensa: 10.0
+    // Treino leve: 3.0, moderada: 6.0, intensa: 8.0
+    // Yoga leve: 2.5, moderada: 3.0, intensa: 4.0
+    // Outro: 4.0 (default)
+    function getMET(activity, intensity) {
+      const metTable = {
+        caminhada: { leve: 3.5, moderada: 4.3, intensa: 5.0 },
+        corrida: { leve: 7.0, moderada: 9.8, intensa: 11.0 },
+        ciclismo: { leve: 4.0, moderada: 6.8, intensa: 8.0 },
+        natação: { leve: 6.0, moderada: 8.0, intensa: 10.0 },
+        treino: { leve: 3.0, moderada: 6.0, intensa: 8.0 },
+        yoga: { leve: 2.5, moderada: 3.0, intensa: 4.0 },
+        outro: { leve: 4.0, moderada: 4.0, intensa: 4.0 },
+      };
+      if (!metTable[activity]) return 4.0;
+      return metTable[activity][intensity] || 4.0;
+    }
+
+    // Calculate calories burned per second
+    function calculateCaloriesPerSecond(met) {
+      // Formula: Calories/min = MET * 3.5 * weight(kg) / 200
+      // Convert to per second: divide by 60
+      return (met * 3.5 * userProfile.weight) / 200 / 60;
+    }
+
+    // Activity tracking
+    function startActivity() {
+      if (!navigator.geolocation) {
+        alert('Geolocalização não suportada pelo seu navegador.');
+        return;
+      }
+
+      activityType = activityTypeSelect.value;
+      activityIntensity = intensityLevelSelect.value;
+
+      btnStartActivity.disabled = true;
+      btnStopActivity.disabled = false;
+      activityInfo.classList.remove('hidden');
+      mapContainer.classList.remove('hidden');
+
+      elapsedSeconds = 0;
+      totalDistance = 0;
+      caloriesBurned = 0;
+      lastPosition = null;
+
+      intensityEl.textContent = activityIntensity.charAt(0).toUpperCase() + activityIntensity.slice(1);
+      timeElapsedEl.textContent = '00:00:00';
+      distanceEl.textContent = '0.00 km';
+      caloriesEl.textContent = '0 kcal';
+
+      // Start timer
+      activityStartTime = Date.now();
+      activityTimer = setInterval(() => {
+        elapsedSeconds++;
+        timeElapsedEl.textContent = formatTime(elapsedSeconds);
+        caloriesEl.textContent = caloriesBurned.toFixed(0) + ' kcal';
+      }, 1000);
+
+      // Start watching position
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+
+          if (lastPosition) {
+            const dist = calculateDistance(
+              lastPosition.latitude,
+              lastPosition.longitude,
+              latitude,
+              longitude
+            );
+            if (dist > 0) {
+              totalDistance += dist;
+              distanceEl.textContent = (totalDistance / 1000).toFixed(2) + ' km';
+
+              // Calculate calories burned incrementally
+              const met = getMET(activityType, activityIntensity);
+              const calPerSec = calculateCaloriesPerSecond(met);
+              caloriesBurned += calPerSec;
+              caloriesEl.textContent = Math.floor(caloriesBurned) + ' kcal';
+            }
+          }
+          lastPosition = { latitude, longitude };
+
+          // Update map with current location and route
+          updateMap(latitude, longitude);
+        },
+        (err) => {
+          console.error('Erro ao obter posição:', err);
+          alert('Erro ao obter posição. Por favor, permita o acesso à localização.');
+          stopActivity();
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 1000,
+          timeout: 10000,
+        }
+      );
+    }
+
+    function stopActivity() {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+      clearInterval(activityTimer);
+      activityTimer = null;
+
+      btnStartActivity.disabled = false;
+      btnStopActivity.disabled = true;
+
+      if (elapsedSeconds === 0) {
+        activityInfo.classList.add('hidden');
+        mapContainer.classList.add('hidden');
+        return;
+      }
+
+      // Save activity to history
+      const now = new Date();
+      const activityRecord = {
+        id: Date.now(),
+        date: now.toISOString(),
+        type: activityType,
+        intensity: activityIntensity.charAt(0).toUpperCase() + activityIntensity.slice(1),
+        duration: elapsedSeconds,
+        distance: totalDistance / 1000,
+        calories: Math.floor(caloriesBurned),
+      };
+
+      saveActivity(activityRecord);
+
+      alert('Atividade salva com sucesso!');
+
+      // Reset UI
+      activityInfo.classList.add('hidden');
+      mapContainer.classList.add('hidden');
+      timeElapsedEl.textContent = '00:00:00';
+      distanceEl.textContent = '0.00 km';
+      caloriesEl.textContent = '0 kcal';
+      intensityEl.textContent = '';
+      lastPosition = null;
+      totalDistance = 0;
+      caloriesBurned = 0;
+      elapsedSeconds = 0;
+      mapFrame.src = '';
+
+      // Show Histórico
+      showSection(sectionHistory);
+      renderHistory();
+    }
+
+    btnStartActivity.addEventListener('click', startActivity);
+    btnStopActivity.addEventListener('click', stopActivity);
+
+    // Map update with Google Maps Embed API (Directions mode not possible without API key)
+    // Instead, we will show current location with a marker and path using Google Maps Static API with path encoded
+    // But since we cannot generate encoded path easily here, we will just show current location with a marker
+    // For a better experience, we embed Google Maps with current location and let user track manually
+
+    // We'll update the iframe src to Google Maps with current location and zoom 15
+    function updateMap(lat, lon) {
+      // Use Google Maps URL with query for current location and walking mode
+      // We will embed a directions URL with origin and destination same to show current location
+      // But directions require two points, so we just show map centered on current location
+
+      // Use Google Maps embed with place marker at current location
+      // URL format: https://www.google.com/maps/embed/v1/view?key=API_KEY&center=lat,lon&zoom=15&maptype=roadmap
+      // We do not have API key, so fallback to maps.google.com with query param
+
+      // Use maps.google.com with query and embed in iframe
+      const url = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+      mapFrame.src = url;
+    }
+
+    // Activity History Storage
+    function getHistory() {
+      const saved = localStorage.getItem('fisiactivo-history');
+      if (!saved) return [];
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return [];
+      }
+    }
+
+    function saveActivity(activity) {
+      const history = getHistory();
+      history.push(activity);
+      localStorage.setItem('fisiactivo-history', JSON.stringify(history));
+    }
+
+    // Render History Table
+    function renderHistory() {
+      const history = getHistory();
+      const typeFilter = filterType.value;
+      const dateFilter = filterDate.value;
+      const dateInput = filterDateInput.value;
+
+      let filtered = history;
+
+      if (typeFilter !== 'todos') {
+        filtered = filtered.filter((a) => a.type === typeFilter);
+      }
+
+      if (dateFilter !== 'todos' && dateInput) {
+        filtered = filtered.filter((a) => {
+          const d = new Date(a.date);
+          const inputDate = new Date(dateInput);
+          if (dateFilter === 'dia') {
+            return (
+              d.getFullYear() === inputDate.getFullYear() &&
+              d.getMonth() === inputDate.getMonth() &&
+              d.getDate() === inputDate.getDate()
+            );
+          } else if (dateFilter === 'mes') {
+            return d.getFullYear() === inputDate.getFullYear() && d.getMonth() === inputDate.getMonth();
+          } else if (dateFilter === 'ano') {
+            return d.getFullYear() === inputDate.getFullYear();
+          }
+          return true;
+        });
+      }
+
+      if (filtered.length === 0) {
+        historyTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center p-4 text-gray-500">Nenhuma atividade encontrada para os filtros selecionados.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      historyTableBody.innerHTML = filtered
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .map((a) => {
+          const d = new Date(a.date);
+          const dateStr = d.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+          return `
+            <tr class="border-t border-green-200 hover:bg-green-50">
+              <td class="p-3 border border-green-200">${dateStr}</td>
+              <td class="p-3 border border-green-200 capitalize">${a.type}</td>
+              <td class="p-3 border border-green-200">${formatTime(a.duration)}</td>
+              <td class="p-3 border border-green-200">${a.distance.toFixed(2)}</td>
+              <td class="p-3 border border-green-200">${a.calories}</td>
+              <td class="p-3 border border-green-200">${a.intensity}</td>
+            </tr>
+          `;
+        })
+        .join('');
+    }
+
+    filterType.addEventListener('change', renderHistory);
+    filterDate.addEventListener('change', () => {
+      if (filterDate.value === 'todos') {
+        filterDateInput.classList.add('hidden');
+        filterDateInput.value = '';
+      } else {
+        filterDateInput.classList.remove('hidden');
+      }
+      renderHistory();
+    });
+    filterDateInput.addEventListener('change', renderHistory);
+
+    // Render Statistics
+    function renderStats() {
+      const history = getHistory();
+      if (history.length === 0) {
+        statsContent.innerHTML = `<p class="text-center text-gray-500">Nenhuma atividade registrada para gerar estatísticas.</p>`;
+        return;
+      }
+
+      const type = statsType.value;
+
+      if (type === 'atividade') {
+        // Agrupar por tipo de atividade
+        const grouped = {};
+        history.forEach((a) => {
+          if (!grouped[a.type]) {
+            grouped[a.type] = { duration: 0, distance: 0, calories: 0, count: 0 };
+          }
+          grouped[a.type].duration += a.duration;
+          grouped[a.type].distance += a.distance;
+          grouped[a.type].calories += a.calories;
+          grouped[a.type].count++;
+        });
+
+        const rows = Object.entries(grouped)
+          .map(([key, val]) => {
+            return `
+              <tr class="border-t border-green-200 hover:bg-green-50">
+                <td class="p-3 border border-green-200 capitalize">${key}</td>
+                <td class="p-3 border border-green-200">${val.count}</td>
+                <td class="p-3 border border-green-200">${formatTime(val.duration)}</td>
+                <td class="p-3 border border-green-200">${val.distance.toFixed(2)}</td>
+                <td class="p-3 border border-green-200">${val.calories}</td>
+              </tr>
+            `;
+          })
+          .join('');
+
+        statsContent.innerHTML = `
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-green-100 text-green-800 font-semibold">
+              <tr>
+                <th class="p-3 border border-green-200">Atividade</th>
+                <th class="p-3 border border-green-200">Quantidade</th>
+                <th class="p-3 border border-green-200">Tempo Total</th>
+                <th class="p-3 border border-green-200">Distância Total (km)</th>
+                <th class="p-3 border border-green-200">Calorias Totais (kcal)</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      } else if (type === 'dia' || type === 'mes' || type === 'ano') {
+        // Agrupar por data
+        const grouped = {};
+        history.forEach((a) => {
+          const d = new Date(a.date);
+          let key = '';
+          if (type === 'dia') {
+            key = d.toLocaleDateString('pt-BR');
+          } else if (type === 'mes') {
+            key = `${d.getMonth() + 1}/${d.getFullYear()}`;
+          } else if (type === 'ano') {
+            key = `${d.getFullYear()}`;
+          }
+          if (!grouped[key]) {
+            grouped[key] = { duration: 0, distance: 0, calories: 0, count: 0 };
+          }
+          grouped[key].duration += a.duration;
+          grouped[key].distance += a.distance;
+          grouped[key].calories += a.calories;
+          grouped[key].count++;
+        });
+
+        const rows = Object.entries(grouped)
+          .sort((a, b) => {
+            // Sort descending by date key
+            if (type === 'dia') {
+              const da = new Date(a[0].split('/').reverse().join('-'));
+              const db = new Date(b[0].split('/').reverse().join('-'));
+              return db - da;
+            } else if (type === 'mes') {
+              const [mA, yA] = a[0].split('/');
+              const [mB, yB] = b[0].split('/');
+              const da = new Date(yA, mA - 1);
+              const db = new Date(yB, mB - 1);
+              return db - da;
+            } else if (type === 'ano') {
+              return parseInt(b[0]) - parseInt(a[0]);
+            }
+            return 0;
+          })
+          .map(([key, val]) => {
+            return `
+              <tr class="border-t border-green-200 hover:bg-green-50">
+                <td class="p-3 border border-green-200">${key}</td>
+                <td class="p-3 border border-green-200">${val.count}</td>
+                <td class="p-3 border border-green-200">${formatTime(val.duration)}</td>
+                <td class="p-3 border border-green-200">${val.distance.toFixed(2)}</td>
+                <td class="p-3 border border-green-200">${val.calories}</td>
+              </tr>
+            `;
+          })
+          .join('');
+
+        statsContent.innerHTML = `
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-green-100 text-green-800 font-semibold">
+              <tr>
+                <th class="p-3 border border-green-200">${type === 'dia' ? 'Dia' : type === 'mes' ? 'Mês/Ano' : 'Ano'}</th>
+                <th class="p-3 border border-green-200">Quantidade</th>
+                <th class="p-3 border border-green-200">Tempo Total</th>
+                <th class="p-3 border border-green-200">Distância Total (km)</th>
+                <th class="p-3 border border-green-200">Calorias Totais (kcal)</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      } else {
+        statsContent.innerHTML = `<p class="text-center text-gray-500">Selecione um tipo válido para visualizar as estatísticas.</p>`;
+      }
+    }
+
+    statsType.addEventListener('change', renderStats);
+
+    // Initialize app showing start section
+    showSection(sectionStart);
+
+    // Accessibility: focus outlines for keyboard users only
+    function handleFirstTab(e) {
+      if (e.key === 'Tab') {
+        document.body.classList.add('user-is-tabbing');
+        window.removeEventListener('keydown', handleFirstTab);
+      }
+    }
+    window.addEventListener('keydown', handleFirstTab);
+  </script>
+</body>
+</html>
